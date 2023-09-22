@@ -14,37 +14,38 @@ class GiphyFullResponse {
 
 @JsonSerializable(createToJson: false)
 class GiphyDataResponse {
-  final String type;
-  final String id;
-  final String url;
   final String title;
-  final String rating;
-  final GiphyImages images;
+  final GiphyResponseImages images;
 
-  GiphyDataResponse(
-      {required this.type,
-      required this.id,
-      required this.url,
-      required this.title,
-      required this.rating,
-      required this.images});
+  GiphyDataResponse({
+    required this.title,
+    required this.images,
+  });
 
   factory GiphyDataResponse.fromJson(Map<String, dynamic> json) =>
       _$GiphyDataResponseFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
-class GiphyImages {
-  final String originalUrl;
-  final String fixedHeightUrl;
-  final String fixedWidthUrl;
+class GiphyResponseImages {
+  final OriginalGif original;
 
-  GiphyImages({
-    required this.originalUrl,
-    required this.fixedHeightUrl,
-    required this.fixedWidthUrl,
+  GiphyResponseImages({
+    required this.original,
   });
 
-  factory GiphyImages.fromJson(Map<String, dynamic> json) =>
-      _$GiphyImagesFromJson(json);
+  factory GiphyResponseImages.fromJson(Map<String, dynamic> json) =>
+      _$GiphyResponseImagesFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class OriginalGif {
+  final String url;
+
+  OriginalGif({
+    required this.url,
+  });
+
+  factory OriginalGif.fromJson(Map<String, dynamic> json) =>
+      _$OriginalGifFromJson(json);
 }
