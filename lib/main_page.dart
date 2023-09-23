@@ -13,15 +13,17 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   late final GiphyRepository giphyRepository;
-  Future<List<GiphyDomain>>? giphyFuture;
+  List<GiphyDomain> gifs = [];
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   Timer? _debouncer;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     giphyRepository = context.read();
-    giphyFuture = giphyRepository.getTrendingGifs();
+    _loadData();
     _searchController.addListener(() {
       _debounceSearch();
     });
@@ -44,31 +46,25 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<GiphyDomain>>(
-              future: giphyFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (scrollInfo) {
+                if (scrollInfo is ScrollEndNotification) {
+                  if (!_isLoading &&
+                      scrollInfo.metrics.pixels >=
+                          scrollInfo.metrics.maxScrollExtent - 400) {
+                    _loadMoreGifs();
+                  }
                 }
-
-                final gifs = snapshot.data ?? [];
-
-                if (gifs.isEmpty) {
-                  return Center(
-                    child: Text('No GIFs available'),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: gifs.length,
-                  itemBuilder: (context, index) {
-                    final gif = gifs[index];
-                    return Image.network(gif.imageUrl);
-                  },
-                );
+                return false;
               },
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: gifs.length,
+                itemBuilder: (context, index) {
+                  final gif = gifs[index];
+                  return Image.network(gif.imageUrl);
+                },
+              ),
             ),
           ),
         ],
@@ -80,6 +76,7 @@ class _MainPageState extends State<MainPage> {
   void dispose() {
     _searchController.dispose();
     _debouncer?.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -89,13 +86,44 @@ class _MainPageState extends State<MainPage> {
     }
     _debouncer = Timer(const Duration(milliseconds: 300), () {
       final query = _searchController.text;
-      setState(() {
-        if (query.isEmpty) {
-          giphyFuture = giphyRepository.getTrendingGifs();
-        } else {
-          giphyFuture = giphyRepository.searchGifs(query);
-        }
-      });
+      _loadData(query: query);
     });
+  }
+
+  Future<void> _loadData({String? query}) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (query == null || query.isEmpty) {
+        final trendingGifs = await giphyRepository.getTrendingGifs();
+        gifs = trendingGifs;
+      } else {
+        final searchGifs = await giphyRepository.searchGifs(query);
+        gifs = searchGifs;
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadMoreGifs() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final additionalGifs = await giphyRepository.getMoreGifs();
+      gifs.addAll(additionalGifs);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }
