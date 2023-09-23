@@ -15,10 +15,19 @@ class GiphyApiClient {
     final response = await _dio.get(
       'trending?api_key=$_apiKey&limit=$limit&offset=$offset&rating=$rating&bundle=$bundle',
     );
-    print('Dio Response: ${response.data}');
 
     final fullResponse = GiphyFullResponse.fromJson(response.data);
     return fullResponse.data;
   }
+
+  Future<List<GiphyDataResponse>> searchGifs(String query) async {
+    final response = await _dio.get(
+        'search?api_key=$_apiKey&q=$query&limit=$limit&offset=$offset&rating=$rating&bundle=$bundle',
+    );
+    final searchResponse = GiphyFullResponse.fromJson(response.data);
+    return searchResponse.data;
+  }
+
+
 
 }

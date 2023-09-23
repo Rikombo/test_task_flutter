@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app/giphy_repository.dart';
@@ -12,54 +12,90 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  late final GiphyRepository _giphyRepository;
-  Future<List<GiphyDomain>>? _giphyFuture;
+  late final GiphyRepository giphyRepository;
+  Future<List<GiphyDomain>>? giphyFuture;
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debouncer;
 
   @override
   void initState() {
     super.initState();
-    _giphyRepository = context.read();
-    _giphyFuture = _giphyRepository.getTrendingGifs();
+    giphyRepository = context.read();
+    giphyFuture = giphyRepository.getTrendingGifs();
+    _searchController.addListener(() {
+      _debounceSearch();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Giphy Test'),
+        backgroundColor: Colors.deepPurple,
+        centerTitle: true,
+        title: Text('Trending GIFs'),
       ),
-      body: FutureBuilder<List<GiphyDomain>>(
-        future: _giphyFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+      body: Column(
+        children: [
+          TextFormField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search GIFs...',
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<GiphyDomain>>(
+              future: giphyFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-          final gifs = snapshot.data ?? [];
+                final gifs = snapshot.data ?? [];
 
-          if (gifs.isEmpty) {
-            return const Center(
-              child: Text('No GIFs available'),
-            );
-          }
+                if (gifs.isEmpty) {
+                  return Center(
+                    child: Text('No GIFs available'),
+                  );
+                }
 
-          return Column(
-            children: [TextFormField(),
-              Expanded(
-                child: ListView.builder(
+                return ListView.builder(
                   itemCount: gifs.length,
                   itemBuilder: (context, index) {
                     final gif = gifs[index];
                     return Image.network(gif.imageUrl);
                   },
-                ),
-              ),
-            ],
-          );
-        },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debouncer?.cancel();
+    super.dispose();
+  }
+
+  void _debounceSearch() {
+    if (_debouncer != null) {
+      _debouncer?.cancel();
+    }
+    _debouncer = Timer(const Duration(milliseconds: 300), () {
+      final query = _searchController.text;
+      setState(() {
+        if (query.isEmpty) {
+          giphyFuture = giphyRepository.getTrendingGifs();
+        } else {
+          giphyFuture = giphyRepository.searchGifs(query);
+        }
+      });
+    });
   }
 }

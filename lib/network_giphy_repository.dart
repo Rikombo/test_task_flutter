@@ -18,4 +18,16 @@ class NetworkGiphyRepository implements GiphyRepository {
     );
     return trendingGifs.toList();
   }
+
+  @override
+  Future<List<GiphyDomain>> searchGifs(String query) async {
+    final response = await _giphyApiClient.searchGifs(query);
+    final search = response.map(
+      (search) => GiphyDomain(
+        title: search.title,
+        imageUrl: search.images.original.url,
+      ),
+    );
+    return search.toList();
+  }
 }
