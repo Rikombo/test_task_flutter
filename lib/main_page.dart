@@ -18,6 +18,7 @@ class _MainPageState extends State<MainPage> {
   final ScrollController _scrollController = ScrollController();
   Timer? _debouncer;
   bool _isLoading = false;
+  String? _currentQuery;
 
   @override
   void initState() {
@@ -33,16 +34,23 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
         centerTitle: true,
-        title: Text('Trending GIFs'),
+        title: Text('GIFs'),
+        backgroundColor: Colors.deepPurple,
       ),
       body: Column(
         children: [
-          TextFormField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search GIFs...',
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: TextFormField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search GIFs...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(width: 10),
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -62,7 +70,16 @@ class _MainPageState extends State<MainPage> {
                 itemCount: gifs.length,
                 itemBuilder: (context, index) {
                   final gif = gifs[index];
-                  return Image.network(gif.imageUrl);
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10.0),
+                      child: Image.network(
+                        gif.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
@@ -86,6 +103,7 @@ class _MainPageState extends State<MainPage> {
     }
     _debouncer = Timer(const Duration(milliseconds: 300), () {
       final query = _searchController.text;
+      _currentQuery = query;
       _loadData(query: query);
     });
   }
@@ -111,14 +129,14 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _loadMoreGifs() async {
-    if (_isLoading) return;
+    if (_isLoading || _currentQuery == null) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final additionalGifs = await giphyRepository.getMoreGifs();
+      final additionalGifs = await giphyRepository.getMoreGifs(query: _currentQuery);
       gifs.addAll(additionalGifs);
     } finally {
       setState(() {
@@ -126,4 +144,5 @@ class _MainPageState extends State<MainPage> {
       });
     }
   }
+
 }
