@@ -11,9 +11,9 @@ class NetworkGiphyRepository implements GiphyRepository {
   Future<List<GiphyDomain>> getTrendingGifs() async {
     final response = await _giphyApiClient.getTrendingGifs();
     final trendingGifs = response.map(
-      (trendingGifs) => GiphyDomain(
-        title: trendingGifs.title,
-        imageUrl: trendingGifs.images.original.url,
+          (trendingGif) => GiphyDomain(
+        title: trendingGif.title,
+        imageUrl: trendingGif.images.original.url,
       ),
     );
     return trendingGifs.toList();
@@ -22,12 +22,24 @@ class NetworkGiphyRepository implements GiphyRepository {
   @override
   Future<List<GiphyDomain>> searchGifs(String query) async {
     final response = await _giphyApiClient.searchGifs(query);
-    final search = response.map(
-      (search) => GiphyDomain(
-        title: search.title,
-        imageUrl: search.images.original.url,
+    final searchGifs = response.map(
+          (searchGif) => GiphyDomain(
+        title: searchGif.title,
+        imageUrl: searchGif.images.original.url,
       ),
     );
-    return search.toList();
+    return searchGifs.toList();
+  }
+
+  @override
+  Future<List<GiphyDomain>> getMoreGifs({int additionalItems = 4}) async {
+    final response = await _giphyApiClient.getMoreGifs(additionalItems: additionalItems);
+    final moreGifs = response.map(
+          (moreGif) => GiphyDomain(
+        title: moreGif.title,
+        imageUrl: moreGif.images.original.url,
+      ),
+    );
+    return moreGifs.toList();
   }
 }
