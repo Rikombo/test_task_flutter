@@ -51,7 +51,7 @@ class _MainPageState extends State<MainPage> {
                 if (scrollInfo is ScrollEndNotification) {
                   if (!_isLoading &&
                       scrollInfo.metrics.pixels >=
-                          scrollInfo.metrics.maxScrollExtent - 400) {
+                          scrollInfo.metrics.maxScrollExtent - 500) {
                     _loadMoreGifs();
                   }
                 }
