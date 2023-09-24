@@ -129,20 +129,26 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _loadMoreGifs() async {
-    if (_isLoading || _currentQuery == null) return;
+    if (_isLoading) return;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final additionalGifs = await giphyRepository.getMoreGifs(query: _currentQuery);
-      gifs.addAll(additionalGifs);
+      if (_currentQuery == null || _currentQuery!.isEmpty) {
+        final additionalTrendingGifs = await giphyRepository.getMoreGifs();
+        gifs.addAll(additionalTrendingGifs);
+      } else {
+        final additionalGifs = await giphyRepository.getMoreGifs(query: _currentQuery);
+        gifs.addAll(additionalGifs);
+      }
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
+
 
 }
