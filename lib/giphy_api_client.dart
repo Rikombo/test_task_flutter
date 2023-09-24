@@ -4,7 +4,7 @@ import 'package:test_app/giphy_response.dart';
 class GiphyApiClient {
   final Dio _dio;
   final String _apiKey = 'SIF4B0wr25IWKjYMjIcoGy6zv4pqbG8H';
-  int limit = 4;
+  int limit = 5;
   int offset = 0;
   final String rating = 'g';
   final String bundle = 'messaging_non_clips';
@@ -27,12 +27,18 @@ class GiphyApiClient {
     return searchResponse.data;
   }
 
-  Future<List<GiphyDataResponse>> getMoreGifs({int additionalItems = 5}) async {
+  Future<List<GiphyDataResponse>> getMoreGifs({
+    int additionalItems = 5,
+    String? query,
+  }) async {
     limit += additionalItems;
     offset += limit;
-    final response = await _dio.get(
-      'trending?api_key=$_apiKey&limit=$limit&offset=$offset&rating=$rating&bundle=$bundle',
-    );
+
+    final endpoint = query != null
+        ? 'search?api_key=$_apiKey&q=$query&limit=$limit&offset=$offset&rating=$rating&bundle=$bundle'
+        : 'trending?api_key=$_apiKey&limit=$limit&offset=$offset&rating=$rating&bundle=$bundle';
+
+    final response = await _dio.get(endpoint);
     final fullResponse = GiphyFullResponse.fromJson(response.data);
     return fullResponse.data;
   }

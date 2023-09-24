@@ -32,8 +32,8 @@ class NetworkGiphyRepository implements GiphyRepository {
   }
 
   @override
-  Future<List<GiphyDomain>> getMoreGifs({int additionalItems = 5}) async {
-    final response = await _giphyApiClient.getMoreGifs(additionalItems: additionalItems);
+  Future<List<GiphyDomain>> getMoreGifs({int additionalItems = 5, String? query}) async {
+    final response = await _giphyApiClient.getMoreGifs(additionalItems: additionalItems, query: query);
     final moreGifs = response.map(
           (moreGif) => GiphyDomain(
         title: moreGif.title,
