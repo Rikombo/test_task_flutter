@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:test_app/giphy_response.dart';
+import 'package:test_app/data/model/giphy_response.dart';
 
 class GiphyApiClient {
   final Dio _dio;
@@ -30,13 +30,11 @@ class GiphyApiClient {
   Future<List<GiphyDataResponse>> getMoreGifs({
     int additionalItems = 5,
     String? query,
+    int offset = 0,
   }) async {
-    limit += additionalItems;
-    offset += limit;
-
     final endpoint = query != null
-        ? 'search?api_key=$_apiKey&q=$query&limit=$limit&offset=$offset&rating=$rating&bundle=$bundle'
-        : 'trending?api_key=$_apiKey&limit=$limit&offset=$offset&rating=$rating&bundle=$bundle';
+        ? 'search?api_key=$_apiKey&q=$query&limit=$additionalItems&offset=$offset&rating=$rating&bundle=$bundle'
+        : 'trending?api_key=$_apiKey&limit=$additionalItems&offset=$offset&rating=$rating&bundle=$bundle';
 
     final response = await _dio.get(endpoint);
     final fullResponse = GiphyFullResponse.fromJson(response.data);

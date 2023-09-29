@@ -1,6 +1,6 @@
-import 'package:test_app/giphy_api_client.dart';
-import 'package:test_app/giphy_domain.dart';
-import 'package:test_app/giphy_repository.dart';
+import 'package:test_app/data/api/giphy_api_client.dart';
+import 'package:test_app/domain/model/giphy_domain.dart';
+import 'package:test_app/domain/repository/giphy_repository.dart';
 
 class NetworkGiphyRepository implements GiphyRepository {
   final GiphyApiClient _giphyApiClient;
@@ -11,7 +11,7 @@ class NetworkGiphyRepository implements GiphyRepository {
   Future<List<GiphyDomain>> getTrendingGifs() async {
     final response = await _giphyApiClient.getTrendingGifs();
     final trendingGifs = response.map(
-          (trendingGif) => GiphyDomain(
+      (trendingGif) => GiphyDomain(
         title: trendingGif.title,
         imageUrl: trendingGif.images.original.url,
       ),
@@ -23,7 +23,7 @@ class NetworkGiphyRepository implements GiphyRepository {
   Future<List<GiphyDomain>> searchGifs(String query) async {
     final response = await _giphyApiClient.searchGifs(query);
     final searchGifs = response.map(
-          (searchGif) => GiphyDomain(
+      (searchGif) => GiphyDomain(
         title: searchGif.title,
         imageUrl: searchGif.images.original.url,
       ),
@@ -32,10 +32,12 @@ class NetworkGiphyRepository implements GiphyRepository {
   }
 
   @override
-  Future<List<GiphyDomain>> getMoreGifs({int additionalItems = 5, String? query}) async {
-    final response = await _giphyApiClient.getMoreGifs(additionalItems: additionalItems, query: query);
+  Future<List<GiphyDomain>> getMoreGifs(
+      {int additionalItems = 5, String? query, int offset = 0}) async {
+    final response = await _giphyApiClient.getMoreGifs(
+        additionalItems: additionalItems, query: query, offset: offset);
     final moreGifs = response.map(
-          (moreGif) => GiphyDomain(
+      (moreGif) => GiphyDomain(
         title: moreGif.title,
         imageUrl: moreGif.images.original.url,
       ),
