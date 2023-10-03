@@ -18,7 +18,7 @@ A simple Flutter application that allows users to search and view trending GIFs.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/gif_search_app.git
+   git clone https://github.com/yourusername/test_task_flutter.git
 2. Navigate to the project directory:
    ```bash
    cd test_task_flutter
