@@ -30,5 +30,5 @@ A simple Flutter application that allows users to search and view trending GIFs.
    flutter run
 
 ## Built with
-Flutter - The UI framework used.
-BLoC - The state management solution used.
+1. Flutter - The UI framework used.
+2. BLoC - The state management solution used.
