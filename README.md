@@ -1,16 +1,17 @@
-# test_app
+# GIF Search App
 
-A new Flutter project.
+A simple Flutter application that allows users to search and view trending GIFs.
+
+## Features
+
+- **Search GIFs**: Users can search for specific GIFs using the search bar.
+- **Trending GIFs**: The app displays trending GIFs by default.
+- **Infinite Scrolling**: As users scroll down, more GIFs are loaded automatically.
+- **Clean Architecture**: The app uses BLoC for state management and separates the UI from the business logic.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter SDK
+- Dart
