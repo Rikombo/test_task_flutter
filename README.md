@@ -15,3 +15,7 @@ A simple Flutter application that allows users to search and view trending GIFs.
 
 - Flutter SDK
 - Dart
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/gif_search_app.git
