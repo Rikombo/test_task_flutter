@@ -5,6 +5,9 @@ abstract class GiphyRepository {
 
   Future<List<GiphyDomain>> searchGifs(String query);
 
-  Future<List<GiphyDomain>> getMoreGifs(
-      {int additionalItems, String? query, int offset});
+  Future<List<GiphyDomain>> getMoreGifs({
+    int additionalItems,
+    String? query,
+    int offset,
+  });
 }

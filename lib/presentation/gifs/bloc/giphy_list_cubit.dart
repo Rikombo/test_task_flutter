@@ -6,69 +6,47 @@ class GiphyListCubit extends Cubit<GiphyListState> {
   final GiphyRepository _giphyRepository;
   String? _currentQuery;
   int _offset = 0;
+  static const int itemsPerPage = 5;
 
   GiphyListCubit(this._giphyRepository)
-      : super(
-          GiphyListState(
-            gifs: [],
-            isLoading: false,
-            isError: false,
-          ),
-        );
+      : super(GiphyListState(
+          gifs: [],
+          isLoading: false,
+          isError: false,
+        ));
 
   Future<void> loadGifs({String? query}) async {
-    _currentQuery = query;
-    _offset = 0;
-    emit(
-      state.copyWith(
-        isLoading: true,
-      ),
-    );
     try {
+      _currentQuery = query;
+      _offset = 0;
+      emit(state.copyWith(isLoading: true, isError: false));
+
       final gifs = query == null
           ? await _giphyRepository.getTrendingGifs()
           : await _giphyRepository.searchGifs(query);
-      emit(
-        state.copyWith(
-          gifs: gifs,
-          isLoading: false,
-        ),
-      );
+
+      emit(state.copyWith(gifs: gifs, isLoading: false));
     } catch (_) {
-      emit(
-        state.copyWith(
-          isError: true,
-          isLoading: false,
-        ),
-      );
+      emit(state.copyWith(isError: true, isLoading: false));
     }
   }
 
   Future<void> loadMoreGifs() async {
-    _offset += 10;
-    emit(
-      state.copyWith(
-        isLoading: true,
-      ),
-    );
     try {
+      _offset += itemsPerPage;
+      emit(state.copyWith(isLoading: true));
+
       final additionalGifs = await _giphyRepository.getMoreGifs(
         offset: _offset,
         query: _currentQuery,
       );
-      emit(
-        state.copyWith(
-          gifs: state.gifs + additionalGifs,
-          isLoading: false,
-        ),
-      );
+
+      emit(state.copyWith(
+        gifs: state.gifs + additionalGifs,
+        isLoading: false,
+      ));
     } catch (_) {
-      emit(
-        state.copyWith(
-          isError: true,
-          isLoading: false,
-        ),
-      );
+      emit(state.copyWith(isError: true, isLoading: false));
     }
   }
 }

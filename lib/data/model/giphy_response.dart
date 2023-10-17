@@ -28,7 +28,6 @@ class GiphyDataResponse {
 
 @JsonSerializable(createToJson: false)
 class GiphyResponseImages {
-  @JsonKey(name: 'fixed_height_downsampled')
   final OriginalGif original;
 
   GiphyResponseImages({

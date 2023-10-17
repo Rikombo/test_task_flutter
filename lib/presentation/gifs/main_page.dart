@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app/presentation/gifs/bloc/giphy_list_cubit.dart';
@@ -20,7 +21,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _cubit = context.read<GiphyListCubit>();
-    _cubit.loadGifs();
+    _cubit.loadGifs(); // Load initial GIFs
     _searchController.addListener(_debounceSearch);
   }
 
@@ -74,8 +75,11 @@ class _MainPageState extends State<MainPage> {
         child: CircularProgressIndicator(),
       );
     } else if (state.isError) {
-      return const Center(
-        child: Text('Failed to load GIFs'),
+      return Center(
+        child: ElevatedButton(
+          onPressed: () => _cubit.loadGifs(),
+          child: const Text('Retry'),
+        ),
       );
     } else {
       return ListView.builder(
@@ -86,9 +90,9 @@ class _MainPageState extends State<MainPage> {
             padding: const EdgeInsets.all(4.0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
-              child: Image.network(
-                gif.imageUrl,
-                fit: BoxFit.cover,
+              child: CachedNetworkImage(
+                imageUrl: gif.imageUrl,
+                errorWidget: (context, url, error) => const Icon(Icons.error),
               ),
             ),
           );
@@ -98,9 +102,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _debounceSearch() {
-    if (_debouncer != null) {
-      _debouncer?.cancel();
-    }
+    if (_debouncer?.isActive ?? false) _debouncer?.cancel();
     _debouncer = Timer(const Duration(milliseconds: 300), () {
       final query = _searchController.text;
       if (query.isNotEmpty) {
